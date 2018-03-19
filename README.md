@@ -1,7 +1,7 @@
 # Tecent-CDC-GoBangTest
 腾讯CDC事业部笔试题
 
-###要求：
+### 要求：
 
 用 Web 技术实现一个五子棋（不用考虑人机对战）
 
