@@ -34,6 +34,7 @@
 
         /* 棋子公共样式 */
         .chess{
+            position: absolute;
             width: 35px;
             height: 35px;
             border-radius: 50%;
@@ -71,6 +72,7 @@
             width: 100%;
             margin: 20px 0 20px 0;
             border-right: 1px solid rgb(71, 71, 71);
+            position: relative;
         }
 
         /* 每一行样式 */
@@ -130,23 +132,39 @@
      * 思路：
      * 1.创建棋盘类
      * 2.创建黑白棋类
-     * 3.下棋历史记录
-     * 4.规则类
+     * 3.棋子落点事件绑定
+     * 4.下棋历史记录，悔棋撤销等
+     * 5.规则类
      */
 
     // 全局常量
     const Length = 15; // 棋盘长宽都为15
     const Black = 1;   // 黑棋
     const White = 2;   // 白棋
+    var flag = 1;      // flag用作代表黑白棋落子，1代表黑棋，2是代表白棋
 
     // 创建五子棋棋盘
     function GoBangBoard (){
         console.log("棋盘初始化完成！");
     }
 
+    var gb = new GoBangBoard();
+
+    // 绝对路径和棋子落点
+    // 绝对路径代表每个棋子落点的唯一性，棋子不能落在同一点
+    GoBangBoard.prototype.absoluteWay = function (black , white){
+      
+        // 判断两个棋子的落点与浏览器之间的距离
+        if(black.style.left === white.style.left || black.style.top === white.style.top){
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+
     // prototype添加方法，初始化棋盘
     GoBangBoard.prototype.init = function (){
-
         // 获取棋盘dom对象
         var board = document.getElementById('board');
 
@@ -164,12 +182,61 @@
             }
         }
 
+        // 事件绑定计算坐标
+        var axis = document.getElementById('board');
+        axis.addEventListener('click',function(el){
+
+            console.log(el);
+            var left = el.target.offsetLeft;  // 棋子距离屏幕左边的距离
+            var top = el.target.offsetTop;    // 棋子距离屏幕上边的距离
+
+            // 黑棋
+            var bChess = document.createElement('div');
+            bChess.classList.add('chess');
+            bChess.classList.add('black');
+
+            // 白棋
+            var wChess = document.createElement('div');
+            wChess.classList.add('chess');
+            wChess.classList.add('white');
 
 
+            // 落子路径判断
+            var bool = gb.absoluteWay(bChess , wChess);
+
+            // 记录
+            var count = 0;
+
+            if(!bool){
+                if(flag === 1){
+
+                    // 黑棋偏移量
+                    bChess.style.cssText = `left : ${left + (bChess.style.left)-17.5}px; 
+                                            top :  ${top + (bChess.style.top)-17.5}px;`;
+                    flag = 2;
+                    console.log(flag , left , parseInt(bChess.style.left) , parseInt(bChess.style.top));
+                    board.appendChild(bChess);
+                }else if(flag === 2){
+                    // 白棋偏移量
+                    wChess.style.cssText = `left : ${left + (bChess.style.left)-17.5}px; 
+                                            top :  ${top + (bChess.style.top)-17.5}px;`;
+                    flag = 1;
+                    console.log(flag);
+                    board.appendChild(wChess);
+                }
+            }else{
+                console.log("黑白两棋落点不能一致");
+            }
+            
+
+        });
     };
 
-    var gb = new GoBangBoard();
+    
+
     gb.init();
+
+
 
 
 
