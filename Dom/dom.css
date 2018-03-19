@@ -1,0 +1,89 @@
+body{
+    max-width: 630px;
+    margin: 0 auto;
+    background-color: coral;
+    font-family: 'Microsoft Yahei', sans-serif;
+}
+
+h2{
+  text-align: center;
+}
+
+/* 弹性盒子布局 */
+.box{
+    display: flex;
+}
+
+/* 公共样式 */
+.chess-item{
+    width: 80px;
+    height: 35px;
+    background-color: #0a9dc7;
+    margin: 0 5px 0 5px;
+    font-size: 15px;
+    color: white;
+    line-height: 35px;
+    text-align: center;
+}
+
+/* 棋子公共样式 */
+.chess{
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+/* 黑棋 */
+.black{
+    background-color: black;
+}
+
+/* 白棋 */
+.white{
+    background-color: white;
+}
+
+/* 悔棋，撤销，重来 */
+.chess-actions{
+    flex-flow: row nowrap;
+    justify-content: center;
+    width: 100%;
+}
+
+/* 当前棋子状态 */
+.chess-status{
+    width: 50px;
+    height: 35px;
+    line-height: 35px;
+    margin: 0 30px 0 0;
+}
+
+/* 棋盘 */
+.chess-board{
+    flex-flow: row wrap;
+    justify-content: center;
+    width: 100%;
+    margin: 20px 0 20px 0;
+    border-right: 1px solid rgb(71, 71, 71);
+    position: relative;
+}
+
+/* 每一行样式 */
+.chess-row{
+    flex-grow: 1;
+}
+
+/* 单元格样式 */
+.cell{
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgb(71, 71, 71);
+    border-right: 0;
+    border-bottom: 0;  
+}
+
+/* 最后一行加上底线 */
+.cell:last-child{
+    border-bottom: 1px solid rgb(71, 71, 71);
+}
