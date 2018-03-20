@@ -23,7 +23,7 @@
       * 思考难点：
       * 1.黑白棋子落点的唯一性（即有占位置的棋子处就不能再落子）
       * 2.黑白棋子落点问题（即玩家不点击交叉点处，点空格中某一点，这时要判断出玩家点击的点距离最近的交叉点，然后在这点落子）
-      * 3.获胜的判断条件（即最先连成5个同色的棋子获胜，连线方式是米字笔画这么多种情况）
+      * 3.获胜的判断条件（即最先连成5个同色的棋子获胜，连线方式是米字型8个区域这么多种情况）
       */
 
     // 全局常量
@@ -101,55 +101,61 @@
              wChess.classList.add('white');
 
              chessStatus = document.getElementById('chess-status');
-             
-             if(flag === 1){
- 
-                 // 这里的思路是：
-                 // left是距离浏览器左边的距离，
-                 // bChess.style.left是棋子相对board棋盘左边偏移的长度，
-                 // 棋子的长宽各为35px，取中值即是让棋子的中点位于board棋盘横纵轴的交叉点上
-                 var bLeft = parseInt(left - (bChess.style.left) - (35 / 2));  // 黑棋左边偏移量
+
+             console.log("aaa",el);
+
+             // 判断落子位置是否有棋子，若有则跳出
+             if(el.target.className.includes('chess')){
+                console.log("不能在同一个位置重复落子",el.target);
+                return false;
+            }
+            else{
+                if(flag === 1){
+    
+                    // 这里的思路是：
+                    // left是距离浏览器左边的距离，
+                    // bChess.style.left是棋子相对board棋盘左边偏移的长度，
+                    // 棋子的长宽各为35px，取中值即是让棋子的中点位于board棋盘横纵轴的交叉点上
+                    var bLeft = parseInt(left - (bChess.style.left) - (35 / 2));  // 黑棋左边偏移量
+                    
+                    var bTop = parseInt(top - (bChess.style.top) - (35 / 2));  // 黑棋顶部偏移量
+
+                    bHistory.push((bLeft + "," + bTop)); // 黑棋每一步历史记录
+
+                    // 黑棋偏移量，绘画棋子
+                    bChess.style.cssText = `left : ${bLeft}px; 
+                                            top :  ${bTop}px;`;
+                    flag = 2;
+
+                    chessStatus.style.cssText = `background-color : white`;
+
+                    console.log("黑棋" , bLeft , bTop);
+                    
+                    board.appendChild(bChess);
+
+                    checkPosition(el ,bChess ,wChess);
+                 
+                }
+                else if(flag === 2){
+                    
+                    // 白棋左边偏移量
+                    var wLeft = parseInt(left - (wChess.style.left)-(35 / 2));
+                    // 白棋顶部偏移量
+                    var wTop = parseInt(top - (wChess.style.top)-(35 / 2));
+                    // 白棋每一步历史记录
+                    wHistory.push((wLeft + "," + wTop));
                 
-                 var bTop = parseInt(top - (bChess.style.top) - (35 / 2));  // 黑棋顶部偏移量
-                
-                 bHistory.push((bLeft + "," + bTop)); // 黑棋每一步历史记录
- 
-                 // 黑棋偏移量，绘画棋子
-                 bChess.style.cssText = `left : ${bLeft}px; 
-                                         top :  ${bTop}px;`;
-                 flag = 2;
+                    // 白棋偏移量，绘画棋子
+                    wChess.style.cssText = `left : ${wLeft}px; 
+                                            top :  ${wTop}px;`;
+                    flag = 1;
 
-                 chessStatus.style.cssText = `background-color : white`;
+                    chessStatus.style.cssText = `background-color : black`;
 
-                 console.log("黑棋" , parseInt(bChess.style.left) , parseInt(bChess.style.top));
-                 
-                 // 落子位置唯一
-                 
-                 board.appendChild(bChess);
-                 
-             }
-             else if(flag === 2){
-                 
-                 // 白棋左边偏移量
-                 var wLeft = parseInt(left - (wChess.style.left)-(35 / 2));
-                 // 白棋顶部偏移量
-                 var wTop = parseInt(top - (wChess.style.top)-(35 / 2));
-                 // 白棋每一步历史记录
-                 wHistory.push((wLeft + "," + wTop));
-             
-                 // 白棋偏移量，绘画棋子
-                 wChess.style.cssText = `left : ${wLeft}px; 
-                                         top :  ${wTop}px;`;
-                 flag = 1;
-
-                 chessStatus.style.cssText = `background-color : black`;
-
-                 console.log("白棋" , parseInt(wChess.style.left) , parseInt(wChess.style.top));
- 
-                 // 落子位置唯一
-                
-                 board.appendChild(wChess);     
-             }
+                    console.log("白棋" , parseInt(wChess.style.left) , parseInt(wChess.style.top));
+                    
+                    board.appendChild(wChess);     
+                }  
  
              // 落子路径判断,保证唯一性
              var bool = gb.absoluteWay(left , top , bChess , wChess);
@@ -160,8 +166,27 @@
                 // 根据黑白棋行棋历史进行悔棋
                 console.log("可以悔棋了");
              }
+            }
             
          });
+    };
+
+    function checkPosition (){
+        if(el.target == null && left - bLeft <= 4 && top - bTop <= 4){
+            console.log("该位置有棋子，不能落子在此",el.target);
+            // 黑棋偏移量，绘画棋子
+            bChess.style.cssText = `left : ${bLeft + 42}px; 
+                                    top :  ${bTop}px;`;
+        }else if(el.target == null && left - bLeft > 4 && top - bTop > 4){
+            // 落点棋子位于原棋子右下角，对角
+            bChess.style.cssText = `left : ${bLeft + 42}px; 
+                                    top :  ${bTop + 42}px;`;
+        }
+        else if(el.target == null && left - bLeft <= 4 && top - bTop > 4){
+            // 落点棋子位于原棋子下边
+            bChess.style.cssText = `left : ${bLeft}px; 
+                                    top :  ${bTop + 42}px;`;
+        }
     }
 
     
@@ -231,11 +256,6 @@
         }
     }
 
-    // 每次新增棋子dom元素时，获取它的标志位，即黑棋或白棋标志位
-    function getChessFlag (flag){
-        return flag;
-    }
-
     // 重新开局
     function reboot (){
         console.log("原始记录：",bHistory,wHistory);
@@ -244,8 +264,7 @@
         flag = 1; 
         bHistory = [];  // 黑棋历史记录
         wHistory = [];  // 白棋历史记录
-
-        console.log("重开记录：",bHistory,wHistory);
+        chessStatus.style.cssText = `background-color : black`;
 
         var chessData = document.getElementsByClassName('chess');
         console.log(chessData);
@@ -258,6 +277,13 @@
     
 
     // 游戏规则
+    // 这里计算了每个小格子的斜边长度是59.39px
+    // (这种方法比较笨)这里我使用了求三角形斜边长度的原理，确认斜边长度等于59.39*5=297px
+    // 所以这里使用了棋子的行棋记录，需要取到
+    function GameRules (){
+    
+
+    }
 
 
 
