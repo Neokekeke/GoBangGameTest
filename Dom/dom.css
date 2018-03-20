@@ -24,6 +24,7 @@ h2{
     color: white;
     line-height: 35px;
     text-align: center;
+    cursor: pointer;
 }
 
 /* 棋子公共样式 */
