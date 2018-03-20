@@ -10,7 +10,8 @@
      */
 
     /**
-     * 思路：
+     * 0.0.1版本
+     * 个人思路：
      * 1.创建棋盘类
      * 2.创建黑白棋
      * 3.棋子落点事件绑定
@@ -18,15 +19,23 @@
      * 5.规则类
      */
 
+     /**
+      * 思考难点：
+      * 1.黑白棋子落点的唯一性（即有占位置的棋子处就不能再落子）
+      * 2.黑白棋子落点问题（即玩家不点击交叉点处，点空格中某一点，这时要判断出玩家点击的点距离最近的交叉点，然后在这点落子）
+      * 3.获胜的判断条件（即最先连成5个同色的棋子获胜，连线方式是米字笔画这么多种情况）
+      */
+
     // 全局常量
     const Length = 15;  // 棋盘长宽都为15
     const Black = 1;    // 黑棋
     const White = 2;    // 白棋
 
     // 标志和记录
-    var flag = 1;       // flag用作代表黑白棋落子，1代表黑棋，2是代表白棋
-    var bHistory = [];  // 黑棋历史记录
-    var wHistory = [];  // 白棋历史记录
+    var flag = 1;         // flag用作代表黑白棋落子，1代表黑棋，2是代表白棋
+    var bHistory = [];    // 黑棋历史记录
+    var wHistory = [];    // 白棋历史记录
+    var chessStatus = ''; // 当前棋子的状态，即轮到哪个颜色的棋子行动了
 
     // 创建五子棋棋盘
     function GoBangBoard (){
@@ -90,7 +99,9 @@
              var wChess = document.createElement('div');
              wChess.classList.add('chess');
              wChess.classList.add('white');
- 
+
+             chessStatus = document.getElementById('chess-status');
+             
              if(flag === 1){
  
                  // 这里的思路是：
@@ -107,6 +118,9 @@
                  bChess.style.cssText = `left : ${bLeft}px; 
                                          top :  ${bTop}px;`;
                  flag = 2;
+
+                 chessStatus.style.cssText = `background-color : white`;
+
                  console.log("黑棋" , parseInt(bChess.style.left) , parseInt(bChess.style.top));
                  
                  // 落子位置唯一
@@ -127,6 +141,9 @@
                  wChess.style.cssText = `left : ${wLeft}px; 
                                          top :  ${wTop}px;`;
                  flag = 1;
+
+                 chessStatus.style.cssText = `background-color : black`;
+
                  console.log("白棋" , parseInt(wChess.style.left) , parseInt(wChess.style.top));
  
                  // 落子位置唯一
