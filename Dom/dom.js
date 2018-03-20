@@ -50,10 +50,11 @@
 
     };
 
-    // prototype添加方法，初始化棋盘
+   
     // 获取棋盘dom对象
     var board = document.getElementById('board');
-
+    
+    // prototype添加方法，初始化棋盘
     GoBangBoard.prototype.init = function (){
         for(let i = 0; i < Length; i++){
             // 创建15行
@@ -75,7 +76,7 @@
     GoBangBoard.prototype.listen = function(){
 
          // 事件绑定计算坐标
-         board.addEventListener('click',function(el){
+         board.addEventListener('click' , function(el){
  
              var left = el.target.offsetLeft;  // 棋子距离屏幕左边的距离
              var top = el.target.offsetTop;    // 棋子距离屏幕上边的距离
@@ -92,9 +93,13 @@
  
              if(flag === 1){
  
-                 var bLeft = parseInt(left - (bChess.style.left)-(35 / 2));  // 黑棋左边偏移量
+                 // 这里的思路是：
+                 // left是距离浏览器左边的距离，
+                 // bChess.style.left是棋子相对board棋盘左边偏移的长度，
+                 // 棋子的长宽各为35px，取中值即是让棋子的中点位于board棋盘横纵轴的交叉点上
+                 var bLeft = parseInt(left - (bChess.style.left) - (35 / 2));  // 黑棋左边偏移量
                 
-                 var bTop = parseInt(top - (bChess.style.top)-(35 / 2));  // 黑棋顶部偏移量
+                 var bTop = parseInt(top - (bChess.style.top) - (35 / 2));  // 黑棋顶部偏移量
                 
                  bHistory.push((bLeft + "," + bTop)); // 黑棋每一步历史记录
  
@@ -198,7 +203,7 @@
 
         // 这里的想法是如果当前board中最后的子元素是白棋的话，则恢复黑棋原来轨迹，反之亦然
         if(board.childNodes[len].classList.value.indexOf('white') > 0){
-             bChess.style.cssText = `left : ${bArr[0]}px;
+            bChess.style.cssText = `left : ${bArr[0]}px;
                                      top : ${bArr[1]}px;`;
             board.appendChild(bChess);
         }
@@ -207,8 +212,6 @@
                                     top : ${wArr[1]}px;`;
             board.appendChild(wChess);
         }
-
-
     }
 
     // 每次新增棋子dom元素时，获取它的标志位，即黑棋或白棋标志位
@@ -222,14 +225,17 @@
 
         // 复位所有全局变量，移除原有棋子dom
         flag = 1; 
-        var bHistory = [];  // 黑棋历史记录
-        var wHistory = [];  // 白棋历史记录
+        bHistory = [];  // 黑棋历史记录
+        wHistory = [];  // 白棋历史记录
 
-        console.log("重开记录：",bHistory);
+        console.log("重开记录：",bHistory,wHistory);
 
         var chessData = document.getElementsByClassName('chess');
+        console.log(chessData);
         for(var i = 0; i < chessData.length; i++){
-            board.removeChild(chessData[i]);
+            while(board.hasChildNodes()){
+                board.removeChild(chessData[i]);
+            }
         }
     };
     
