@@ -32,8 +32,8 @@ h2{
 /* 棋子公共样式 */
 .chess{
     position: absolute;
-    width: 35px;
-    height: 35px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     box-shadow: 6px 3px 15px #333333;
 }
@@ -83,8 +83,8 @@ h2{
 
 /* 单元格样式 */
 .cell{
-    width: 40px;
-    height: 40px;
+    width: 41px;
+    height: 41px;
     border: 1px solid rgb(71, 71, 71);
     border-right: 0;
     border-bottom: 0;  
