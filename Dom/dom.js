@@ -353,29 +353,75 @@
         var y = top / 42;
         console.log(x, y);
 
+         /********************************************************* */
         // 水平方向判断 
         // 水平向右查找，x坐标++ ， y坐标不变，x+1是从右方向的下一个棋子开始判断
         for(var i = x+1; i < Length; i++){
-            if( nullHistory[i][y] === history[i] ){
+            if( nullHistory[i][y] === flag ){
                 count++;
             }
-            console.log("右", i , count , nullHistory[i][y] , history[i]);
+            //console.log("右", i , count);
         }
 
         // 水平向左查找，x坐标-- ，y坐标不变 
         for(var i = x-1; i > 0; i--){
-            if( nullHistory[i][y] === history[i] ){
+            if( nullHistory[i][y] === flag ){
                 count++;
             }
-            console.log("左", i , count);
+            //console.log("左", i , count);
         }
 
-        // 垂直
+        /********************************************************* */
+        // 垂直方向判断
+        // 垂直向上查找，x坐标不变，y坐标--，
+        for(var i = y-1; i > 0; i--){
+            if( nullHistory[x][i] === flag ){
+                count++;
+            }
+        }
+
+        // 垂直向下查找，x坐标不变，y坐标++
+        for(var i = y+1; i < Length; i++){
+            if( nullHistory[x][i] === flag ){
+                count++;
+            }
+        }
+
+        /********************************************************* */
+        // 交叉边方向判断
+        // 左上斜边查找，x坐标--，y坐标--
+        for(var i = x-1 , j = y-1; i > 0 , j > 0; i-- , j--){
+            if( nullHistory[i][j] === flag ){
+                count++;
+            }
+        } 
+
+        // 右上斜边查找，x坐标++，y坐标--
+        for(var i = x+1 , j = y-1; i < Length , j > 0; i++ , j--){
+            if( nullHistory[i][j] === flag ){
+                count++;
+            }
+        }
+
+        // 左下斜边查找，x坐标--，y坐标++
+        for(var i = x-1 , j = y+1; i > 0 , j < Length; i-- , j++){
+            if( nullHistory[i][j] === flag ){
+                count++;
+            }
+        }
+
+        // 右下斜边查找，x坐标++，y坐标++
+        for(var i = x+1 , j = y+1; i < Length , j < Length; i++ , j++ ){
+            if( nullHistory[i][j] === flag ){
+                count++;
+            }
+        }
+
 
         var winner = '';
         // 当count>=5时获得胜利
         if(count >= 5){
-            if( history === bHistory ){
+            if( flag === 1 ){
                 winner += "黑棋赢了哦~";
             }else{
                 winner += "白棋赢了哦~";
@@ -389,6 +435,10 @@
     // 版本切换
     // version 版本: dom , canvas
     function toggle ( version ){
+
+        var txt = document.getElementById('canvasTxt'); 
+        txt.innerHTML = "canvas版本正在努力完工中......";
+
         if( version === "dom"){
             // var board = document.createElement('div');
             // board.setAttribute('id', 'board');
@@ -399,11 +449,13 @@
             document.body.appendChild(board); 
             document.body.removeChild(canvas);
             console.log("dom版本");
+            txt.style.cssText = `visibility : hidden`;
         }
         else if(version === "canvas"){
             document.body.removeChild(board);
             gb.initCanvas();
-            console.log("canvas版本")
+            txt.style.cssText = `visibility : visible; color : white; margin : 0 0 0 80px;background : #e20f08`;
+            console.log("canvas版本");
         }
     }
 
