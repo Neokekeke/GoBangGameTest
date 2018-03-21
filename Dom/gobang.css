@@ -99,3 +99,10 @@ h2,h5{
 .cell:last-child{
     border-bottom: 1px solid rgb(71, 71, 71);
 }
+
+/* 遮罩层弹窗 */
+.play_again{
+    width: 150px;
+    height: 100px;
+    transition: 1s;
+}

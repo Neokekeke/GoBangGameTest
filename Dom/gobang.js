@@ -25,8 +25,8 @@
       * 1.黑白棋子落点的唯一性（即有占位置的棋子处就不能再落子）
       * 2.黑白棋子落点问题（即玩家不点击交叉点处，点空格中某一点，这时要判断出玩家点击的点距离最近的交叉点，然后在这点落子）
       * 3.棋盘二维数组保存记录问题
-      * 4.获胜的判断条件（即最先连成5个同色的棋子获胜，连线方式是米字型8个区域这么多种情况）
-      * 5.canvas版本，x,y坐标确定问题
+      * 4.获胜的判断条件（即最先连成5个同色的棋子获胜，连线方式是米字型8个区域这么多种情况，交叉边判断逻辑等）
+      * 5.canvas版本，x,y坐标确定问题，棋子是绘制还是加dom？
       */
 
     // 全局常量
@@ -78,7 +78,7 @@
         gb.listen(); // 对棋盘添加监听器
     };
 
-    // canvas版本
+    // canvas版本(未完成)
     var canvas = document.createElement('canvas');
     GoBangBoard.prototype.initCanvas = function (){
          
@@ -184,7 +184,7 @@
         });
     }; 
 
-    // 绘画dom节点棋子
+    // 绘画节点棋子
     function drawChess (flag , left , top , history , axis , chess){
 
         // 这里的思路是：
@@ -336,12 +336,12 @@
         var wAxisArr = wAxis[wAxisLen].split(",");  
 
         return chess_history = {
-            len,
-            bArr,
-            wArr,
-            bAxisArr,
-            wAxisArr
-        }
+                len,
+                bArr,
+                wArr,
+                bAxisArr,
+                wAxisArr
+        };
     }
     
     // 游戏规则
@@ -356,20 +356,24 @@
         var y = top / 42;
         console.log(x, y);
 
-         /********************************************************* */
+        /********************************************************* */
         // 水平方向判断 
         // 水平向右查找，x坐标++ ， y坐标不变，x+1是从右方向的下一个棋子开始判断
-        for(var i = x+1; i < Length; i++){
+        for(let i = x+1; i < Length; i++){
             if( nullHistory[i][y] === flag ){
                 count++;
+            }else{
+                break;
             }
             //console.log("右", i , count);
         }
 
         // 水平向左查找，x坐标-- ，y坐标不变 
-        for(var i = x-1; i > 0; i--){
+        for(let i = x-1; i > 0; i--){
             if( nullHistory[i][y] === flag ){
                 count++;
+            }else{
+                break;
             }
             //console.log("左", i , count);
         }
@@ -377,49 +381,60 @@
         /********************************************************* */
         // 垂直方向判断
         // 垂直向上查找，x坐标不变，y坐标--，
-        for(var i = y-1; i > 0; i--){
+        for(let i = y-1; i > 0; i--){
             if( nullHistory[x][i] === flag ){
                 count++;
+            }else{
+                break;
             }
         }
 
         // 垂直向下查找，x坐标不变，y坐标++
-        for(var i = y+1; i < Length; i++){
+        for(let i = y+1; i < Length; i++){
             if( nullHistory[x][i] === flag ){
                 count++;
+            }else{
+                break;
             }
         }
 
         /********************************************************* */
         // 交叉边方向判断
         // 左上斜边查找，x坐标--，y坐标--
-        for(var i = x-1 , j = y-1; i > 0 , j > 0; i-- , j--){
+        for(let i = x-1 , j = y-1; i > 0 , j > 0; i-- , j--){
             if( nullHistory[i][j] === flag ){
                 count++;
+            }else{
+                break;
             }
         } 
 
         // 右上斜边查找，x坐标++，y坐标--
-        for(var i = x+1 , j = y-1; i < Length , j > 0; i++ , j--){
+        for(let i = x+1 , j = y-1; i < Length , j > 0; i++ , j--){
             if( nullHistory[i][j] === flag ){
                 count++;
+            }else{
+                break;
             }
         }
 
         // 左下斜边查找，x坐标--，y坐标++
-        for(var i = x-1 , j = y+1; i > 0 , j < Length; i-- , j++){
+        for(let i = x-1 , j = y+1; i > 0 , j < Length; i-- , j++){
             if( nullHistory[i][j] === flag ){
                 count++;
+            }else{
+                break;
             }
         }
 
         // 右下斜边查找，x坐标++，y坐标++
-        for(var i = x+1 , j = y+1; i < Length , j < Length; i++ , j++ ){
+        for(let i = x+1 , j = y+1; i < Length , j < Length; i++ , j++ ){
             if( nullHistory[i][j] === flag ){
                 count++;
+            }else{
+                break;
             }
         }
-
 
         var winner = '';
         // 当count>=5时获得胜利
@@ -431,8 +446,6 @@
             }
             alert(winner);
         }
-
-
     }
 
     // 版本切换
@@ -462,4 +475,12 @@
         }
     }
 
+    // 弹窗显示重来一局游戏
+    function playAgain (){
+
+       // 当赢得比赛时，添加遮罩层，不让用户操作了
+
+
+    }
+    playAgain();
     gb.init(); // 初始化棋盘，默认dom版本
