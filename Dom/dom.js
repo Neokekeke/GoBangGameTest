@@ -54,7 +54,7 @@
     // 获取棋盘dom对象
     var board = document.getElementById('board');
     
-    // prototype添加方法，初始化棋盘
+    // prototype添加方法，初始化棋盘，dom版本
     GoBangBoard.prototype.init = function (){
         for(let i = 0; i < Length; i++){
             // 创建15行
@@ -75,14 +75,35 @@
                 resetHistory[i][j] = 0; // 这里初始resetHistory状态，记录位
             }
         }
-        gb.listen(); // 对棋盘添加监听器
+        gb.listen(board); // 对棋盘添加监听器
+    };
+
+    // canvas版本
+    var canvas = document.createElement('canvas');
+    GoBangBoard.prototype.initCanvas = function (){
+         
+         var context = canvas.getContext('2d');
+         canvas.setAttribute('id' , 'canvas');
+         canvas.style.cssText = `margin: 20px 0 20px 0; box-shadow: 8px 8px 20px #7a7a7a;`;
+         canvas.width = document.body.clientWidth;
+         canvas.height = 630;
+         context.strokeStyle = "rgb(71, 71, 71)";
+         
+         for(var i = 0; i < 15; i++){
+             for(var j = 0; j < 15; j++){
+                 context.lineWidth = 1;
+                 context.strokeRect(i * 42 , j * 42 , 41 , 41);
+             }
+         }    
+         document.body.appendChild(canvas);
+         gb.listen(canvas);
     };
 
     // 监听棋盘
-    GoBangBoard.prototype.listen = function(){
+    GoBangBoard.prototype.listen = function( obj ){
         
-         // 事件绑定计算坐标
-         board.addEventListener('click' , function(el){
+         // 事件绑定计算坐标，dom或者canvas
+         obj.addEventListener('click' , function(el){
 
             var left = el.target.offsetLeft;  // 棋子距离屏幕左边的距离
             var top = el.target.offsetTop;    // 棋子距离屏幕上边的距离
@@ -115,9 +136,9 @@
     
                         chessStatus.style.cssText = `background-color : white`;
     
-                        console.log("黑棋" , left / 42 , top / 42);
+                        console.log("黑棋" , Math.round(left / 42) , Math.round(top / 42));
                         
-                        board.appendChild(drawChess(flag , left , top  , bHistory , bAxis , bChess));
+                        obj.appendChild(drawChess(flag , left , top  , bHistory , bAxis , bChess));
    
                         bFlag = 1; // 新增黑棋落子后，又可以悔棋
 
@@ -129,7 +150,7 @@
 
                         console.log("白棋" , left / 42 , top / 42);
 
-                        board.appendChild(drawChess(flag , left , top , wHistory , wAxis , wChess));     
+                        obj.appendChild(drawChess(flag , left , top , wHistory , wAxis , wChess));     
 
                         wFlag = 1; // 新增黑棋落子后，又可以悔棋
 
@@ -146,7 +167,6 @@
                     return false;
                }
             }
-            
          });
     };
 
@@ -164,37 +184,37 @@
 
         axis.push((left / 42 + "," + top / 42));
 
-        nullHistory[left / 42][top / 42] = chessLeft + "," + chessTop; // 添加落棋位置
+        nullHistory[Math.round(left / 42)][Math.round(top / 42)] = chessLeft + "," + chessTop; // 添加落棋位置
 
         console.log("当前棋盘记录：",nullHistory);
 
         // 棋子偏移量，绘画棋子
         chess.style.cssText = `left : ${chessLeft}px; 
                                 top :  ${chessTop}px;`;
-
         return chess;
-        
     }
 
     // 悔棋
-    function recall (){
+    function recall (obj = null){
         console.log("黑棋：", bHistory);
         console.log("白棋：", wHistory);
 
-        var len = board.childNodes.length-1;
+        obj = board !== undefined ? board : canvas;
+
+        var len = obj.childNodes.length-1;
         var rc = this.chessHistory();  // 获取x,y坐标
 
         if(bHistory.length !== 0 && wHistory.length !== 0){
-            if( bFlag !== 0 && board.childNodes[len].classList.value.indexOf('black') > 0){
-                board.removeChild(board.childNodes[len]);
+            if( bFlag !== 0 && obj.childNodes[len].classList.value.indexOf('black') > 0){
+                obj.removeChild(obj.childNodes[len]);
                 wFlag = 0; 
                 flag = 1;   // 复位删除掉的黑棋，即悔棋后保证下次落子是黑棋
                 nullHistory[rc.bAxisArr[0]][rc.bAxisArr[1]] = 0; // 清除该位置的记录
                 console.log("黑棋悔棋：", nullHistory);
             }
 
-            if( wFlag !== 0 && board.childNodes[len].classList.value.indexOf('white') > 0 ){
-                board.removeChild(board.childNodes[len]);
+            if( wFlag !== 0 && obj.childNodes[len].classList.value.indexOf('white') > 0 ){
+                obj.removeChild(obj.childNodes[len]);
                 bFlag = 0;
                 flag = 2;   // 复位删除掉的白棋，即悔棋后保证下次落子是白棋
                 nullHistory[rc.wAxisArr[0]][rc.wAxisArr[1]] = 0; // 清除
@@ -209,11 +229,12 @@
             console.log("白棋还没下");
             return false;
         }
-    
     }
 
     // 撤销悔棋
-    function cancelRecall (){
+    function cancelRecall (obj = null){
+
+        obj = board !== undefined ? board : canvas;
 
         var cancel = this.chessHistory(); // 根据棋子行棋记录返回的对象
 
@@ -226,33 +247,35 @@
         wChess.classList.add('white');
 
         // 这里的想法是如果当前board中最后的子元素是白棋的话，则恢复黑棋原来轨迹，反之亦然
-        if(wFlag == 0 && board.childNodes[cancel.len].classList.value.indexOf('white') > 0){           
+        if(wFlag == 0 && obj.childNodes[cancel.len].classList.value.indexOf('white') > 0){           
             nullHistory[cancel.bAxisArr[0]][cancel.bAxisArr[1]] = cancel.bArr.join(); // 还原移除的值
 
             bChess.style.cssText = `left : ${cancel.bArr[0]}px;
-                                        top : ${cancel.bArr[1]}px;`;
-            board.appendChild(bChess);
+                                    top : ${cancel.bArr[1]}px;`;
+            obj.appendChild(bChess);
             flag = 2; // 保证下次是下白棋，因为恢复的是黑棋                        
         }
-        else if(bFlag == 0 && board.childNodes[cancel.len].classList.value.indexOf('black') > 0){
+        else if(bFlag == 0 && obj.childNodes[cancel.len].classList.value.indexOf('black') > 0){
 
             nullHistory[cancel.wAxisArr[0]][cancel.wAxisArr[1]] = cancel.wArr.join();
 
             wChess.style.cssText = `left : ${cancel.wArr[0]}px;
                                     top : ${cancel.wArr[1]}px;`;
-            board.appendChild(wChess);
+            obj.appendChild(wChess);
             flag = 1; // 保证下次是下黑棋，因为恢复的是白棋  
         }
         else{
-            console.log("不能重复悔棋");
+            console.log("不能重复撤销");
             return;
         }
         console.log("撤销悔棋", nullHistory);
     }
 
     // 重新开局
-    function reboot (){
+    function reboot (obj = null){
         console.log("原始记录：",bHistory , wHistory);
+
+        obj = board !== undefined ? board : canvas;
 
         // 复位所有全局变量，移除原有棋子dom
         flag = 1; 
@@ -266,17 +289,20 @@
 
         //console.log(chessData);
         for(var i = 0; i < chessData.length; i++){
-            while(board.hasChildNodes()){
-                board.removeChild(chessData[i]);
+            while(obj.hasChildNodes()){
+                obj.removeChild(chessData[i]);
             }
         }
     };
 
     // 黑棋和白棋历史记录计算
-    function chessHistory (){
+    function chessHistory (obj = null){
+
+        obj = board !== undefined ? board : canvas; 
+
         var bLen = bHistory.length - 1;            // 黑棋历史行棋轨迹
         var wLen = wHistory.length - 1;            // 白棋历史行棋轨迹
-        var len  = board.childNodes.length - 1;    // board棋盘子节点长度
+        var len  = obj.childNodes.length - 1;      // board或者canvas棋盘子节点长度
         var bAxisLen = bAxis.length - 1;           // 黑棋对应的坐标
         var wAxisLen = wAxis.length - 1;           // 白棋对应的坐标
 
@@ -295,7 +321,6 @@
         }
     }
     
-
     // 游戏规则
     // 单色棋首先5个连线，根据坐标米字型可以划分为8个区域，(上，下，左，右，左斜上，右斜上，左斜下，右斜下)
     // 判断8个区域中
@@ -305,4 +330,25 @@
 
     }
 
-    gb.init(); // 初始化棋盘
+    // 版本切换
+    // version 版本: dom , canvas
+    function toggle ( version ){
+        if( version === "dom"){
+            // var board = document.createElement('div');
+            // board.setAttribute('id', 'board');
+            // board.setAttribute('class','box chess-board');
+            //gb.init();
+
+            // html文件中存在board DOM对象，就不用再创建dom对象了，移除只是从页面中移除子节点，重新在根节点中添加即可
+            document.body.appendChild(board); 
+            document.body.removeChild(canvas);
+            console.log("dom版本");
+        }
+        else if(version === "canvas"){
+            document.body.removeChild(board);
+            gb.initCanvas();
+            console.log("canvas版本")
+        }
+    }
+
+    gb.init(); // 初始化棋盘，默认dom版本
