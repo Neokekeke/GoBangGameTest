@@ -38,7 +38,6 @@
     var bAxis = [];              // 存储对应的黑棋坐标，是取整left/42       
     var wAxis = [];              // 存储对应的黑棋坐标，是取整left/42
     var nullHistory = [Length];  // 记录空白位置，这里存储的是棋子left和top的偏移量
-    var resetHistory = [Length]; // 复位空白位置，默认二维数组，255格子值都为0
     var chessStatus = '';        // 当前棋子的状态，即轮到哪个颜色的棋子行动了
         
     var bFlag = 1;               // 黑棋标志位，当bFlag=0时，即黑棋只能悔棋一次
@@ -63,7 +62,6 @@
             board.appendChild(row);
 
             nullHistory[i] = new Array(Length);  // 创建15个二维数组
-            resetHistory[i] = new Array(Length); // 重置空位置数组
 
             for(let j = 0; j < Length; j++){
                 // 创建棋子单元格
@@ -72,10 +70,9 @@
                 row.appendChild(cell);
 
                 nullHistory[i][j] = 0;  // 255个格子的值都为0，代表空位置
-                resetHistory[i][j] = 0; // 这里初始resetHistory状态，记录位
             }
         }
-        gb.listen(board); // 对棋盘添加监听器
+        gb.listen(); // 对棋盘添加监听器
     };
 
     // canvas版本
@@ -92,18 +89,18 @@
          for(var i = 0; i < 15; i++){
              for(var j = 0; j < 15; j++){
                  context.lineWidth = 1;
-                 context.strokeRect(i * 42 , j * 42 , 41 , 41);
+                 context.strokeRect(i * 42 , j * 42 , 42 , 42);
              }
          }    
          document.body.appendChild(canvas);
-         gb.listen(canvas);
+         gb.listenCanvas();
     };
 
-    // 监听棋盘
-    GoBangBoard.prototype.listen = function( obj ){
+    // 监听dom创建的棋盘
+    GoBangBoard.prototype.listen = function(){
         
          // 事件绑定计算坐标，dom或者canvas
-         obj.addEventListener('click' , function(el){
+         board.addEventListener('click' , function(el){
 
             var left = el.target.offsetLeft;  // 棋子距离屏幕左边的距离
             var top = el.target.offsetTop;    // 棋子距离屏幕上边的距离
@@ -138,11 +135,13 @@
     
                         console.log("黑棋" , Math.round(left / 42) , Math.round(top / 42));
                         
-                        obj.appendChild(drawChess(flag , left , top  , bHistory , bAxis , bChess));
+                        board.appendChild(drawChess(flag , left , top  , bHistory , bAxis , bChess));
    
                         bFlag = 1; // 新增黑棋落子后，又可以悔棋
 
                         flag = 2;  // 黑棋落完子，切换flag，轮到白子落子
+
+                        window.GameRules(1 , left , top); // 每次落完棋子后判断输赢
                     }
                     else if(flag === 2){
 
@@ -150,11 +149,13 @@
 
                         console.log("白棋" , left / 42 , top / 42);
 
-                        obj.appendChild(drawChess(flag , left , top , wHistory , wAxis , wChess));     
+                        board.appendChild(drawChess(flag , left , top , wHistory , wAxis , wChess));     
 
                         wFlag = 1; // 新增黑棋落子后，又可以悔棋
 
                         flag = 1;  // 白棋落完子，切换flag，轮到黑棋落子
+
+                        window.GameRules(2 , left , top); // 每次落完棋子后判断输赢
                     }
                     if(wHistory.length === 0){
                         console.log("白棋为空数组");
@@ -170,7 +171,17 @@
          });
     };
 
-    // 绘画棋子
+
+    // 监听canvas绘画的棋子
+    GoBangBoard.prototype.listenCanvas = function (){
+
+        canvas.addEventListener('click' , function(el){
+            console.log(el);
+
+        });
+    }; 
+
+    // 绘画dom节点棋子
     function drawChess (flag , left , top , history , axis , chess){
 
         // 这里的思路是：
@@ -184,9 +195,12 @@
 
         axis.push((left / 42 + "," + top / 42));
 
-        nullHistory[Math.round(left / 42)][Math.round(top / 42)] = chessLeft + "," + chessTop; // 添加落棋位置
+        nullHistory[Math.round(left / 42)][Math.round(top / 42)] = flag; // 添加落棋位置
 
         console.log("当前棋盘记录：",nullHistory);
+
+        console.log("黑棋记录",bHistory);
+        console.log("白棋历史",wHistory);
 
         // 棋子偏移量，绘画棋子
         chess.style.cssText = `left : ${chessLeft}px; 
@@ -281,7 +295,13 @@
         flag = 1; 
         bHistory = [];    // 黑棋历史记录
         wHistory = [];    // 白棋历史记录
-        nullHistory = resetHistory; // 同时也清空棋子在棋盘的占位历史记录，避免出现空指针异常
+   
+        // 同时也清空棋子在棋盘的占位历史记录，避免出现空指针异常
+        for(var i = 0; i < Length; i++){ 
+            for(var j = 0; j < Length; j++){
+                nullHistory[i][j] = 0
+            }
+        }
         chessStatus.style.cssText = `background-color : black`;
 
         var chessData = document.getElementsByClassName('chess');
@@ -309,7 +329,7 @@
         var bArr = bHistory[bLen].split(",");      // 单独获取最后黑棋一个元素的坐标，并拼接成数组，得到x,y坐标
         var wArr = wHistory[wLen].split(",");      // 单独获取最后白棋一个元素的坐标，并拼接成数组，得到x,y坐标
 
-        var bAxisArr = bAxis[bAxisLen].split(",");  
+        var bAxisArr = bAxis[bAxisLen].split(","); // 得到黑棋的坐标，这里的坐标是left/42 , top/42得到的下标
         var wAxisArr = wAxis[wAxisLen].split(",");  
 
         return chess_history = {
@@ -325,8 +345,44 @@
     // 单色棋首先5个连线，根据坐标米字型可以划分为8个区域，(上，下，左，右，左斜上，右斜上，左斜下，右斜下)
     // 判断8个区域中
     // 所以这里使用了棋子的行棋记录，需要取到
-    function GameRules (bHistory , wHistory , bChess , wChess){
+    function GameRules (flag, left , top){
     
+        var count = 1; // 记录输赢标志位
+
+        var x = left / 42;
+        var y = top / 42;
+        console.log(x, y);
+
+        // 水平方向判断 
+        // 水平向右查找，x坐标++ ， y坐标不变，x+1是从右方向的下一个棋子开始判断
+        for(var i = x+1; i < Length; i++){
+            if( nullHistory[i][y] === history[i] ){
+                count++;
+            }
+            console.log("右", i , count , nullHistory[i][y] , history[i]);
+        }
+
+        // 水平向左查找，x坐标-- ，y坐标不变 
+        for(var i = x-1; i > 0; i--){
+            if( nullHistory[i][y] === history[i] ){
+                count++;
+            }
+            console.log("左", i , count);
+        }
+
+        // 垂直
+
+        var winner = '';
+        // 当count>=5时获得胜利
+        if(count >= 5){
+            if( history === bHistory ){
+                winner += "黑棋赢了哦~";
+            }else{
+                winner += "白棋赢了哦~";
+            }
+            alert(winner);
+        }
+
 
     }
 
