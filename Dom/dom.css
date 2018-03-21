@@ -5,8 +5,9 @@ body{
     font-family: 'Microsoft Yahei', sans-serif;
 }
 
-h2{
+h2,h5{
   text-align: center;
+  font-family: 'Microsoft Yahei', sans-serif;
 }
 
 /* 弹性盒子布局 */
@@ -74,11 +75,14 @@ h2{
     margin: 20px 0 20px 0;
     border-right: 1px solid rgb(71, 71, 71);
     position: relative;
+    box-shadow: 8px 8px 20px #7a7a7a;
 }
 
 /* 每一行样式 */
 .chess-row{
     flex-grow: 1;
+    /* 格子立体样式看着眼花 */
+    /* box-shadow: 1px 1px 5px #555555; */
 }
 
 /* 单元格样式 */
@@ -88,6 +92,7 @@ h2{
     border: 1px solid rgb(71, 71, 71);
     border-right: 0;
     border-bottom: 0;  
+    /* box-shadow: 1px 3px 8px #555555; */
 }
 
 /* 最后一行加上底线 */
