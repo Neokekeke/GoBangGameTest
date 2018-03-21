@@ -40,6 +40,9 @@
     var nullHistory = [Length];  // 记录空白位置，这里存储的是棋子left和top的偏移量
     var resetHistory = [Length]; // 复位空白位置，默认二维数组，255格子值都为0
     var chessStatus = '';        // 当前棋子的状态，即轮到哪个颜色的棋子行动了
+        
+    var bFlag = 1;               // 黑棋标志位，当bFlag=0时，即黑棋只能悔棋一次
+    var wFlag = 1;               // 白棋标志位，当bFlag=0时，即白棋只能悔棋一次
 
     // 创建五子棋棋盘
     function GoBangBoard (){
@@ -115,8 +118,10 @@
                         console.log("黑棋" , left / 42 , top / 42);
                         
                         board.appendChild(drawChess(flag , left , top  , bHistory , bAxis , bChess));
+   
+                        bFlag = 1; // 新增黑棋落子后，又可以悔棋
 
-                        flag = 2; // 黑棋落完子，切换flag，轮到白子落子
+                        flag = 2;  // 黑棋落完子，切换flag，轮到白子落子
                     }
                     else if(flag === 2){
 
@@ -126,7 +131,9 @@
 
                         board.appendChild(drawChess(flag , left , top , wHistory , wAxis , wChess));     
 
-                        flag = 1; // 白棋落完子，切换flag，轮到黑棋落子
+                        wFlag = 1; // 新增黑棋落子后，又可以悔棋
+
+                        flag = 1;  // 白棋落完子，切换flag，轮到黑棋落子
                     }
                     if(wHistory.length === 0){
                         console.log("白棋为空数组");
@@ -168,9 +175,6 @@
         return chess;
         
     }
-    
-    var bFlag = 1;   // 黑棋标志位，当bFlag=0时，即黑棋只能悔棋一次
-    var wFlag = 1;   // 白棋标志位，当bFlag=0时，即白棋只能悔棋一次
 
     // 悔棋
     function recall (){
@@ -183,20 +187,18 @@
         if(bHistory.length !== 0 && wHistory.length !== 0){
             if( bFlag !== 0 && board.childNodes[len].classList.value.indexOf('black') > 0){
                 board.removeChild(board.childNodes[len]);
-                wFlag = 0;
-                flag = 1;  // 复位删除掉的黑棋，即悔棋后保证下次落子是黑棋
+                wFlag = 0; 
+                flag = 1;   // 复位删除掉的黑棋，即悔棋后保证下次落子是黑棋
                 nullHistory[rc.bAxisArr[0]][rc.bAxisArr[1]] = 0; // 清除该位置的记录
                 console.log("黑棋悔棋：", nullHistory);
-                return;
             }
 
             if( wFlag !== 0 && board.childNodes[len].classList.value.indexOf('white') > 0 ){
                 board.removeChild(board.childNodes[len]);
                 bFlag = 0;
-                flag = 2;  // 复位删除掉的白棋，即悔棋后保证下次落子是白棋
+                flag = 2;   // 复位删除掉的白棋，即悔棋后保证下次落子是白棋
                 nullHistory[rc.wAxisArr[0]][rc.wAxisArr[1]] = 0; // 清除
                 console.log("白棋悔棋：", nullHistory);
-                return;
             }
 
             else{
@@ -224,21 +226,26 @@
         wChess.classList.add('white');
 
         // 这里的想法是如果当前board中最后的子元素是白棋的话，则恢复黑棋原来轨迹，反之亦然
-        if(board.childNodes[cancel.len].classList.value.indexOf('white') > 0){
-
+        if(wFlag == 0 && board.childNodes[cancel.len].classList.value.indexOf('white') > 0){           
             nullHistory[cancel.bAxisArr[0]][cancel.bAxisArr[1]] = cancel.bArr.join(); // 还原移除的值
 
             bChess.style.cssText = `left : ${cancel.bArr[0]}px;
-                                     top : ${cancel.bArr[1]}px;`;
+                                        top : ${cancel.bArr[1]}px;`;
             board.appendChild(bChess);
+            flag = 2; // 保证下次是下白棋，因为恢复的是黑棋                        
         }
-        else{
+        else if(bFlag == 0 && board.childNodes[cancel.len].classList.value.indexOf('black') > 0){
 
             nullHistory[cancel.wAxisArr[0]][cancel.wAxisArr[1]] = cancel.wArr.join();
 
             wChess.style.cssText = `left : ${cancel.wArr[0]}px;
                                     top : ${cancel.wArr[1]}px;`;
             board.appendChild(wChess);
+            flag = 1; // 保证下次是下黑棋，因为恢复的是白棋  
+        }
+        else{
+            console.log("不能重复悔棋");
+            return;
         }
         console.log("撤销悔棋", nullHistory);
     }
@@ -290,10 +297,10 @@
     
 
     // 游戏规则
-    // 这里计算了每个小格子的斜边长度是59.39px
-    // (这种方法比较笨)这里我使用了求三角形斜边长度的原理，确认斜边长度等于59.39*5=297px
+    // 单色棋首先5个连线，根据坐标米字型可以划分为8个区域，(上，下，左，右，左斜上，右斜上，左斜下，右斜下)
+    // 判断8个区域中
     // 所以这里使用了棋子的行棋记录，需要取到
-    function GameRules (){
+    function GameRules (bHistory , wHistory , bChess , wChess){
     
 
     }
