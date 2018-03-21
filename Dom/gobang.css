@@ -1,7 +1,7 @@
 body{
     max-width: 630px;
     margin: 0 auto;
-    background-color: coral;
+    background-color: #D0BB73;
     font-family: 'Microsoft Yahei', sans-serif;
 }
 
@@ -19,7 +19,7 @@ h2,h5{
 .chess-item{
     width: 80px;
     height: 35px;
-    background-color: #0a9dc7;
+    background-color: #c74f0a;
     margin: 0 5px 0 5px;
     font-size: 15px;
     color: white;
@@ -89,7 +89,7 @@ h2,h5{
 .cell{
     width: 41px;
     height: 41px;
-    border: 1px solid rgb(71, 71, 71);
+    border: 1px solid #531C29;
     border-right: 0;
     border-bottom: 0;  
     /* box-shadow: 1px 3px 8px #555555; */
