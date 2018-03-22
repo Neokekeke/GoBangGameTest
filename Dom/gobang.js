@@ -306,7 +306,7 @@
 
         obj = board !== undefined ? board : canvas;
 
-        gb.init();
+        //gb.init();
         // 复位所有全局变量，移除原有棋子dom
         flag = 1; 
         bHistory = [];    // 黑棋历史记录
@@ -389,7 +389,7 @@
         }
 
         // 水平向左查找，x坐标-- ，y坐标不变 
-        for(let i = x-1; i > 0; i--){
+        for(let i = x-1; i >= 0; i--){
             if( nullHistory[i][y] === flag ){
                 hozCount++;
             }else{
@@ -401,7 +401,7 @@
         /********************************************************* */
         // 垂直方向判断
         // 垂直向上查找，x坐标不变，y坐标--，
-        for(let i = y-1; i > 0; i--){
+        for(let i = y-1; i >= 0; i--){
             if( nullHistory[x][i] === flag ){
                 verCount++;
             }else{
@@ -421,7 +421,7 @@
         /********************************************************* */
         // 交叉边方向判断
         // 左上斜边查找，x坐标--，y坐标--
-        for(let i = x-1 , j = y-1; i > 0 , j > 0; i-- , j--){
+        for(let i = x-1 , j = y-1; i >= 0 , j >= 0; i-- , j--){
             if( nullHistory[i][j] === flag ){
                 leftCount++;
             }else{
@@ -430,7 +430,7 @@
         } 
 
         // 右上斜边查找，x坐标++，y坐标--
-        for(let i = x+1 , j = y-1; i < Length , j > 0; i++ , j--){
+        for(let i = x+1 , j = y-1; i < Length , j >= 0; i++ , j--){
             if( nullHistory[i][j] === flag ){
                 rightCount++;
             }else{
@@ -439,7 +439,7 @@
         }
 
         // 左下斜边查找，x坐标--，y坐标++
-        for(let i = x-1 , j = y+1; i > 0 , j < Length; i-- , j++){
+        for(let i = x-1 , j = y+1; i >= 0 , j < Length; i-- , j++){
             if( nullHistory[i][j] === flag ){
                 leftCount++;
             }else{
