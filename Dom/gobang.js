@@ -46,6 +46,8 @@
     var bFlag = 1;               // 黑棋标志位，当bFlag=0时，即黑棋只能悔棋一次
     var wFlag = 1;               // 白棋标志位，当bFlag=0时，即白棋只能悔棋一次
 
+    var winner = '';             // 获胜方
+
     // 创建五子棋棋盘
     function GoBangBoard (){
         console.log("棋盘初始化完成！");
@@ -102,8 +104,8 @@
     // 监听dom创建的棋盘
     GoBangBoard.prototype.listen = function(){
         
-         // 事件绑定计算坐标，dom或者canvas
-         board.addEventListener('click' , function(el){
+         // 事件绑定计算坐标，dom落子
+         board.onclick = function(el){
 
             var left = el.target.offsetLeft;  // 棋子距离屏幕左边的距离
             var top = el.target.offsetTop;    // 棋子距离屏幕上边的距离
@@ -171,7 +173,7 @@
                     return false;
                }
             }
-         });
+         }
     };
 
 
@@ -216,76 +218,86 @@
         console.log("黑棋：", bHistory);
         console.log("白棋：", wHistory);
 
-        obj = board !== undefined ? board : canvas;
+        if(winner == ''){
+            obj = board !== undefined ? board : canvas;
 
-        var len = obj.childNodes.length-1;
-        var rc = this.chessHistory();  // 获取x,y坐标
-
-        if(bHistory.length !== 0 && wHistory.length !== 0){
-            if( bFlag !== 0 && obj.childNodes[len].classList.value.indexOf('black') > 0){
-                obj.removeChild(obj.childNodes[len]);
-                wFlag = 0; 
-                flag = 1;   // 复位删除掉的黑棋，即悔棋后保证下次落子是黑棋
-                nullHistory[rc.bAxisArr[0]][rc.bAxisArr[1]] = 0; // 清除该位置的记录
-                console.log("黑棋悔棋：", nullHistory);
+            var len = obj.childNodes.length-1;
+            var rc = this.chessHistory();  // 获取x,y坐标
+    
+            if(bHistory.length !== 0 && wHistory.length !== 0){
+                if( bFlag !== 0 && obj.childNodes[len].classList.value.indexOf('black') > 0){
+                    obj.removeChild(obj.childNodes[len]);
+                    wFlag = 0; 
+                    flag = 1;   // 复位删除掉的黑棋，即悔棋后保证下次落子是黑棋
+                    nullHistory[rc.bAxisArr[0]][rc.bAxisArr[1]] = 0; // 清除该位置的记录
+                    console.log("黑棋悔棋：", nullHistory);
+                }
+    
+                if( wFlag !== 0 && obj.childNodes[len].classList.value.indexOf('white') > 0 ){
+                    obj.removeChild(obj.childNodes[len]);
+                    bFlag = 0;
+                    flag = 2;   // 复位删除掉的白棋，即悔棋后保证下次落子是白棋
+                    nullHistory[rc.wAxisArr[0]][rc.wAxisArr[1]] = 0; // 清除
+                    console.log("白棋悔棋：", nullHistory);
+                }
+    
+                else{
+                    console.log("只能悔棋一次哦"); // bFlag或wFlag等于0时不能悔棋
+                }
+    
+            }else if(wHistory.length === 0){
+                console.log("白棋还没下");
+                return false;
             }
-
-            if( wFlag !== 0 && obj.childNodes[len].classList.value.indexOf('white') > 0 ){
-                obj.removeChild(obj.childNodes[len]);
-                bFlag = 0;
-                flag = 2;   // 复位删除掉的白棋，即悔棋后保证下次落子是白棋
-                nullHistory[rc.wAxisArr[0]][rc.wAxisArr[1]] = 0; // 清除
-                console.log("白棋悔棋：", nullHistory);
-            }
-
-            else{
-                console.log("只能悔棋一次哦"); // bFlag或wFlag等于0时不能悔棋
-            }
-
-        }else if(wHistory.length === 0){
-            console.log("白棋还没下");
-            return false;
+        }else{
+            console.log("已经结束游戏了");
+            return;
         }
     }
 
     // 撤销悔棋
     function cancelRecall (obj = null){
 
-        obj = board !== undefined ? board : canvas;
+        if(winner === ''){
+            obj = board !== undefined ? board : canvas;
 
-        var cancel = this.chessHistory(); // 根据棋子行棋记录返回的对象
-
-        var bChess = document.createElement('div');  // 撤销悔棋这里是重新插入dom
-        bChess.classList.add('chess');
-        bChess.classList.add('black');
-
-        var wChess = document.createElement('div');  // 撤销悔棋这里是重新插入dom
-        wChess.classList.add('chess');
-        wChess.classList.add('white');
-
-        // 这里的想法是如果当前board中最后的子元素是白棋的话，则恢复黑棋原来轨迹，反之亦然
-        if(wFlag == 0 && obj.childNodes[cancel.len].classList.value.indexOf('white') > 0){           
-            nullHistory[cancel.bAxisArr[0]][cancel.bAxisArr[1]] = cancel.bArr.join(); // 还原移除的值
-
-            bChess.style.cssText = `left : ${cancel.bArr[0]}px;
-                                    top : ${cancel.bArr[1]}px;`;
-            obj.appendChild(bChess);
-            flag = 2; // 保证下次是下白棋，因为恢复的是黑棋                        
-        }
-        else if(bFlag == 0 && obj.childNodes[cancel.len].classList.value.indexOf('black') > 0){
-
-            nullHistory[cancel.wAxisArr[0]][cancel.wAxisArr[1]] = cancel.wArr.join();
-
-            wChess.style.cssText = `left : ${cancel.wArr[0]}px;
-                                    top : ${cancel.wArr[1]}px;`;
-            obj.appendChild(wChess);
-            flag = 1; // 保证下次是下黑棋，因为恢复的是白棋  
-        }
-        else{
-            console.log("不能重复撤销");
+            var cancel = this.chessHistory(); // 根据棋子行棋记录返回的对象
+    
+            var bChess = document.createElement('div');  // 撤销悔棋这里是重新插入dom
+            bChess.classList.add('chess');
+            bChess.classList.add('black');
+    
+            var wChess = document.createElement('div');  // 撤销悔棋这里是重新插入dom
+            wChess.classList.add('chess');
+            wChess.classList.add('white');
+    
+            // 这里的想法是如果当前board中最后的子元素是白棋的话，则恢复黑棋原来轨迹，反之亦然
+            if(wFlag == 0 && obj.childNodes[cancel.len].classList.value.indexOf('white') > 0){           
+                nullHistory[cancel.bAxisArr[0]][cancel.bAxisArr[1]] = cancel.bArr.join(); // 还原移除的值
+    
+                bChess.style.cssText = `left : ${cancel.bArr[0]}px;
+                                        top : ${cancel.bArr[1]}px;`;
+                obj.appendChild(bChess);
+                flag = 2; // 保证下次是下白棋，因为恢复的是黑棋                        
+            }
+            else if(bFlag == 0 && obj.childNodes[cancel.len].classList.value.indexOf('black') > 0){
+    
+                nullHistory[cancel.wAxisArr[0]][cancel.wAxisArr[1]] = cancel.wArr.join();
+    
+                wChess.style.cssText = `left : ${cancel.wArr[0]}px;
+                                        top : ${cancel.wArr[1]}px;`;
+                obj.appendChild(wChess);
+                flag = 1; // 保证下次是下黑棋，因为恢复的是白棋  
+            }
+            else{
+                console.log("不能重复撤销");
+                return;
+            }
+            console.log("撤销悔棋", nullHistory);
+        }else{
+            console.log("已经结束游戏了");
             return;
         }
-        console.log("撤销悔棋", nullHistory);
     }
 
     // 重新开局
@@ -294,6 +306,7 @@
 
         obj = board !== undefined ? board : canvas;
 
+        gb.init();
         // 复位所有全局变量，移除原有棋子dom
         flag = 1; 
         bHistory = [];    // 黑棋历史记录
@@ -435,14 +448,14 @@
                 break;
             }
         }
-
-        var winner = '';
         // 当count>=5时获得胜利
         if(count >= 5){
             if( flag === 1 ){
-                winner += "黑棋赢了哦~";
+                winner = "黑棋赢了哦~";
+                board.onclick = null; // 移除board事件绑定
             }else{
-                winner += "白棋赢了哦~";
+                winner = "白棋赢了哦~";
+                board.onclick = null;
             }
             alert(winner);
         }
@@ -456,11 +469,6 @@
         txt.innerHTML = "canvas版本正在努力完工中......";
 
         if( version === "dom"){
-            // var board = document.createElement('div');
-            // board.setAttribute('id', 'board');
-            // board.setAttribute('class','box chess-board');
-            //gb.init();
-
             // html文件中存在board DOM对象，就不用再创建dom对象了，移除只是从页面中移除子节点，重新在根节点中添加即可
             document.body.appendChild(board); 
             document.body.removeChild(canvas);
@@ -475,12 +483,4 @@
         }
     }
 
-    // 弹窗显示重来一局游戏
-    function playAgain (){
-
-       // 当赢得比赛时，添加遮罩层，不让用户操作了
-
-
-    }
-    playAgain();
     gb.init(); // 初始化棋盘，默认dom版本
