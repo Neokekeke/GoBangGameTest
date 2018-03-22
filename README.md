@@ -10,3 +10,9 @@
 实现一个悔棋的功能
 
 实现一个撤销悔棋的功能
+
+
+目前暂时实现DOM版本的五子棋，Canvas版本正在修改......
+
+五子棋游戏预览：
+[https://neokekeke.github.io/GoBangTestV1/gobang_v1.html](https://neokekeke.github.io/GoBangTestV1/gobang_v1.html "五子棋游戏在线预览")
