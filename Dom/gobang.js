@@ -363,7 +363,14 @@
     // 所以这里使用了棋子的行棋记录，需要取到
     function GameRules (flag, left , top){
     
-        var count = 1; // 记录输赢标志位
+        // 上下方向计数
+        var verCount = 1;
+        // 水平方向计数
+        var hozCount = 1;
+        // 左交叉线计数
+        var leftCount = 1;
+        // 右交叉线计数
+        var rightCount = 1;
 
         var x = left / 42;
         var y = top / 42;
@@ -374,7 +381,7 @@
         // 水平向右查找，x坐标++ ， y坐标不变，x+1是从右方向的下一个棋子开始判断
         for(let i = x+1; i < Length; i++){
             if( nullHistory[i][y] === flag ){
-                count++;
+                hozCount++;
             }else{
                 break;
             }
@@ -384,7 +391,7 @@
         // 水平向左查找，x坐标-- ，y坐标不变 
         for(let i = x-1; i > 0; i--){
             if( nullHistory[i][y] === flag ){
-                count++;
+                hozCount++;
             }else{
                 break;
             }
@@ -396,7 +403,7 @@
         // 垂直向上查找，x坐标不变，y坐标--，
         for(let i = y-1; i > 0; i--){
             if( nullHistory[x][i] === flag ){
-                count++;
+                verCount++;
             }else{
                 break;
             }
@@ -405,7 +412,7 @@
         // 垂直向下查找，x坐标不变，y坐标++
         for(let i = y+1; i < Length; i++){
             if( nullHistory[x][i] === flag ){
-                count++;
+                verCount++;
             }else{
                 break;
             }
@@ -416,7 +423,7 @@
         // 左上斜边查找，x坐标--，y坐标--
         for(let i = x-1 , j = y-1; i > 0 , j > 0; i-- , j--){
             if( nullHistory[i][j] === flag ){
-                count++;
+                leftCount++;
             }else{
                 break;
             }
@@ -425,7 +432,7 @@
         // 右上斜边查找，x坐标++，y坐标--
         for(let i = x+1 , j = y-1; i < Length , j > 0; i++ , j--){
             if( nullHistory[i][j] === flag ){
-                count++;
+                rightCount++;
             }else{
                 break;
             }
@@ -434,7 +441,7 @@
         // 左下斜边查找，x坐标--，y坐标++
         for(let i = x-1 , j = y+1; i > 0 , j < Length; i-- , j++){
             if( nullHistory[i][j] === flag ){
-                count++;
+                leftCount++;
             }else{
                 break;
             }
@@ -443,13 +450,13 @@
         // 右下斜边查找，x坐标++，y坐标++
         for(let i = x+1 , j = y+1; i < Length , j < Length; i++ , j++ ){
             if( nullHistory[i][j] === flag ){
-                count++;
+                rightCount++;
             }else{
                 break;
             }
         }
         // 当count>=5时获得胜利
-        if(count >= 5){
+        if(verCount >= 5 || hozCount >= 5 || leftCount >= 5 || rightCount >= 5){
             if( flag === 1 ){
                 winner = "黑棋赢了哦~";
                 board.onclick = null; // 移除board事件绑定
