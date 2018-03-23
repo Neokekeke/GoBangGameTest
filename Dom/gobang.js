@@ -246,16 +246,14 @@ function recallDom(rc){
 // canvas悔棋
 function recallCanvas(rc){
     if(bFlag !== 0 && flag === 1){
-        console.log(rc);
         ctx.clearRect(rc.wArr[0] - 18 , rc.wArr[1] - 18 , 36 , 36);
         wFlag = 0;
-        flag = 2;
+        flag = 1;
         nullHistory[rc.wAxisArr[1]][rc.wAxisArr[0]] = 0; 
     }else if(wFlag !== 0 && flag === 2){
-        console.log(rc.wAxisArr);
         ctx.clearRect(rc.bArr[0] - 18 ,rc.bArr[1] - 18, 36 , 36);
         bFlag = 0;
-        flag = 1; 
+        flag = 2; 
         nullHistory[rc.bAxisArr[1]][rc.bAxisArr[0]] = 0; 
     }else {
         console.log("只能悔棋一次哦"); // bFlag或wFlag等于0时不能悔棋
@@ -308,10 +306,10 @@ function domCancel(cancel){
 
 // canvas撤销悔棋
 function canvasCancel(cancel){
-    console.log(cancel);
     var posX;
     var posY;
-    if(wFlag == 0 && flag == 2){
+    var ctx = canvas.getContext('2d');
+    if(wFlag == 0 && flag == 1){
         posX = cancel.wArr[0];
         posY = cancel.wArr[1];
         nullHistory[posY / 42][posX / 42] = 2;
@@ -322,7 +320,7 @@ function canvasCancel(cancel){
         ctx.fill();
         flag = 1;
     }
-    else if(bFlag == 0 && flag == 1){
+    else if(bFlag == 0 && flag == 2){
         posX = cancel.bArr[0];
         posY = cancel.bArr[1];
         nullHistory[posY / 42][posX / 42] = 1;
