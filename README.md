@@ -15,4 +15,4 @@
 目前暂时实现DOM版本的五子棋，Canvas版本正在修改......
 
 五子棋游戏预览：
-[https://neokekeke.github.io/GoBangTestV1/gobang_v1.html](https://neokekeke.github.io/GoBangTestV1/gobang_v1.html "五子棋游戏在线预览")
+[https://neokekeke.github.io/GoBangTest/gobang_v3.html](https://neokekeke.github.io/GoBangTest/gobang_v3.html "五子棋游戏在线预览")
