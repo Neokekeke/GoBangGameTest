@@ -11,8 +11,8 @@
 
 实现一个撤销悔棋的功能
 
-
-目前暂时实现DOM版本的五子棋，Canvas版本正在修改......
+2018-3-23 更新
+修复可见性bug，Canva版本撤销悔棋部分存在部分问题
 
 五子棋游戏预览：
 [https://neokekeke.github.io/GoBangTest/gobang_v3.html](https://neokekeke.github.io/GoBangTest/gobang_v3.html "五子棋游戏在线预览")
