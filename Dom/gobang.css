@@ -1,8 +1,9 @@
 body{
-    max-width: 630px;
+    max-width: 588px;
     margin: 0 auto;
     background-color: #D0BB73;
     font-family: 'Microsoft Yahei', sans-serif;
+    position: relative;
 }
 
 h2,h5{
@@ -12,7 +13,12 @@ h2,h5{
 
 /* 弹性盒子布局 */
 .box{
-    display: flex;
+    display: -webkit-box; /* Chrome 4+, Safari 3.1, iOS Safari 3.2+ */
+    display: -moz-box; /* Firefox 17- */
+    display: -webkit-flex; /* Chrome 21+, Safari 6.1+, iOS Safari 7+, Opera 15/16 */
+    display: -moz-flex; /* Firefox 18+ */
+    display: -ms-flexbox; /* IE 10 */
+    display: flex; /* Chrome 29+, Firefox 22+, IE 11+, Opera 12.1/17/18, Android 4.4+ */
 }
 
 /* 公共样式 */
@@ -37,6 +43,7 @@ h2,h5{
     height: 36px;
     border-radius: 50%;
     box-shadow: 6px 3px 15px #333333;
+    flex: 1;
 }
 
 /* 黑棋 */
@@ -73,32 +80,49 @@ h2,h5{
     justify-content: center;
     width: 100%;
     margin: 20px 0 20px 0;
-    border-right: 1px solid rgb(71, 71, 71);
-    position: relative;
+    border-left: 1px solid rgb(71, 71, 71);
+    border-top: 1px solid rgb(71, 71, 71);
     box-shadow: 8px 8px 20px #7a7a7a;
     z-index: 99;
+    display: block;
+    position: absolute;
+}
+
+.Panel{
+    position: absolute;
+    width: 100%;
+    height: 588px;
+    z-index: 100;
+    display: block;
+    margin: 20px 0 20px 0;
 }
 
 /* 每一行样式 */
 .chess-row{
-    flex-grow: 1;
+    display: flex;
+    flex: 1;
     /* 格子立体样式看着眼花 */
     /* box-shadow: 1px 1px 5px #555555; */
 }
 
 /* 单元格样式 */
 .cell{
+    flex: 1;
     width: 41px;
     height: 41px;
-    border: 1px solid #531C29;
-    border-right: 0;
-    border-bottom: 0;  
+    border-right: 1px solid #531C29;
+    border-bottom: 1px solid #531C29;  
     /* box-shadow: 1px 3px 8px #555555; */
 }
 
 /* 最后一行加上底线 */
-.cell:last-child{
-    border-bottom: 1px solid rgb(71, 71, 71);
+.chess-row:nth-child(15){
+    /* background: black; */
+}
+
+.cell:nth-child(15){
+    /* background: #D0BB73;
+    border-bottom : 0; */
 }
 
 /* 遮罩层弹窗 */
